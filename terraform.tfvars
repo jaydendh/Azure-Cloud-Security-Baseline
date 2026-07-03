@@ -1,0 +1,2 @@
+yourname = "jayden"
+location = "centralus"
