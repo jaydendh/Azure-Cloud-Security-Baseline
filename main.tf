@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-${var.yourname}"
+  name     = "rg-cloudsec-${var.yourname}"
   location = var.location
 }
 
@@ -24,7 +24,7 @@ resource "azurerm_key_vault" "main" {
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "standard"
 
-  public_network_access_enabled = false
+  public_network_access_enabled = true
 
   soft_delete_retention_days = 7
 
