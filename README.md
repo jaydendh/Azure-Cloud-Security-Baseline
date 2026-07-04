@@ -226,7 +226,7 @@ AzureDiagnostics
 
 ![Diagnostic Setting](./screenshots/15-diagnostic-setting.png)
 
-![KQL Audit](./screenshots/kql-audit.png)
+![KQL Audit](./screenshots/16-kql-audit.png)
 
 > Note: allow ~10–15 minutes after enabling the diagnostic setting for logs to start flowing before the query returns rows.
 
