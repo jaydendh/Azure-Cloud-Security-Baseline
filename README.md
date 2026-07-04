@@ -67,28 +67,6 @@ The design isolates the secret store from the public internet entirely. Key Vaul
 
 ---
 
-## Repository Structure
-
-```
-Azure-Cloud-Security-Baseline/
-├── .github/
-│   └── workflows/
-│       └── terraform.yml        # CI on PR, CI+CD on merge to main
-├── scripts/
-│   ├── bootstrap-backend.sh     # creates the remote-state storage account
-│   └── setup-oidc.sh            # creates the OIDC app + federated credentials
-├── docs/
-│   └── images/                  # screenshots referenced in this README
-├── main.tf                      # KV, Private Endpoint, DNS, VNet
-├── variables.tf
-├── terraform.tfvars
-├── backend.tf                   # remote state (required for CI/CD)
-├── custom-role.json             # RBAC definition exported from the portal (Part 4, reference)
-└── README.md
-```
-
----
-
 ## CI/CD Pipeline
 
 The workflow (`.github/workflows/terraform.yml`) has two jobs driven entirely by which event fired:
@@ -116,7 +94,6 @@ cd:
 Both are created by `scripts/setup-oidc.sh`. Miss one and that half of the pipeline fails to authenticate.
 
 ![Federated Credentials](./screenshots/02-federated-credentials.png)
-> Entra ID → App registrations → your app → *Certificates & secrets* → *Federated credentials*, showing both `gh-main` and `gh-pr`. Save as `docs/images/02-federated-credentials.png`.
 
 > **Workflow note:** CI runs on pull requests to `main`. To get a CI run on a feature branch, open a PR against `main`. To also fire CI on every direct push to a feature branch, add those branches under `on.push.branches`.
 
@@ -136,10 +113,6 @@ Run these **once**, locally, before the first pipeline run.
 
 **1. Create the remote-state storage account:**
 
-```bash
-./scripts/bootstrap-backend.sh
-```
-
 Copy the printed storage account name into `backend.tf` (`storage_account_name`).
 
 **2. Create the OIDC identity and federated credentials:**
@@ -153,7 +126,6 @@ Copy the printed storage account name into `backend.tf` (`storage_account_name`)
 *Settings → Secrets and variables → Actions*: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`.
 
 ![Github Secrets](./screenshots/03-github-secrets.png)
-> The three repository secrets configured (values masked by GitHub automatically). Save as `docs/images/03-github-secrets.png`.
 
 ---
 
@@ -169,16 +141,12 @@ git push origin feature/my-change
 ```
 
 ![PR CI Passing](./screenshots/04-pr-ci-passing.png)
-> The PR "Checks" tab with the `CI — Validate & Plan` job green. Save as `docs/images/04-pr-ci-passing.png`.
 
 ![PR Plan](./screenshots/05-pr-plan-comment.png)
-> The bot comment showing the collapsible `Terraform Plan` output. Save as `docs/images/05-pr-plan-comment.png`.
 
 Merge the PR. The push to `main` triggers the deploy:
 
 ![CD Apply](./screenshots/06-cd-apply.png)
-> The Actions run for the merge commit with both `ci` and `cd` jobs green, and the `Terraform Apply` step expanded to show `Apply complete!`. Save as `docs/images/06-cd-apply.png`.
-
 ---
 
 ## Walkthrough
@@ -190,10 +158,8 @@ Defender for Cloud's free tier (foundational CSPM) is on by default and provides
 > Note: the compliance percentage reflects only the mapped policy definitions — some CIS controls have no automated Azure Policy mapping, so 100% here is not the same as full CIS compliance.
 
 ![Security Score](./07-secure-score.png)
-> Defender for Cloud → Overview, showing the secure score gauge. Save as `docs/images/07-secure-score.png`.
 
 ![CIS Compliance](./screenshots/08-cis-compliance.png)
-> Azure Policy → Compliance, showing the CIS initiative with its compliance percentage; drill into one non-compliant control so the finding detail is visible. Save as `docs/images/08-cis-compliance.png`.
 
 ### 2. Key Vault + Private Endpoint
 
@@ -202,10 +168,8 @@ Terraform provisions the VNet, subnet, Key Vault (public access **disabled**), t
 > **Seeding the secret:** because public access is disabled, the vault only accepts data-plane calls over the private endpoint. The secret is therefore **not** created by Terraform (that call would come from outside the VNet and be rejected). Seed it once from inside the VNet — e.g. from the VM in Part 3 — with `az keyvault secret set`. This also keeps the secret value out of Terraform state.
 
 ![KV Public Access Disabled](./screenshots/09-kv-public-access-disabled.png)
-> Key Vault → Networking blade, showing *Public network access: Disabled*. Save as `docs/images/09-kv-public-access-disabled.png`.
 
 ![Private Endpoint](./screenshots/10-private-endpoint.png)
-> The Private Endpoint resource → Overview, showing its private IP in `10.40.1.x`. Save as `docs/images/10-private-endpoint.png`.
 
 ### 3. Verifying the Private Endpoint
 
@@ -223,10 +187,8 @@ nslookup kv-lab-jayden.vault.azure.net
 ```
 
 ![Public Access Blocked](./screenshots/11-public-access-blocked.png)
-> Your terminal showing the "Public network access is disabled" error from your laptop. Save as `docs/images/11-public-access-blocked.png`.
 
 ![Private Resolution Success](./screenshots/12-private-resolution-success.png)
-> Terminal from the in-VNet VM: `nslookup` returning a `10.40.x.x` address and the secret retrieval succeeding. Save as `docs/images/12-private-resolution-success.png`.
 
 ### 4. Custom RBAC Role
 
@@ -241,14 +203,12 @@ Instead of the broad built-in *Key Vault Secrets User* role, a custom role is cr
 **Assign the role** — same resource group → **Access control (IAM)** → **+ Add** → **Add role assignment** → select the custom role → add your account as a member → **Review + assign**.
 
 ![Custom Roles](./screenshots/13-custom-role.png)
-> The resource group → Access control (IAM), showing the custom role's *JSON* / permissions view, and/or the role assignment granting it to your account. Save as `docs/images/13-custom-role.png`.
 
 ### 5. Defender Recommendations (Detect)
 
 With Defender for Key Vault enabled, Defender for Cloud surfaces active recommendations scoped to the vault — including **"Diagnostic logs in Key Vault should be enabled,"** along with firewall, secret-expiration, deletion-protection, and *"RBAC should be used on Key Vault"* findings. The diagnostic-logging finding is the one remediated in Part 6; the RBAC finding corroborates the access-mode note under [Notes](#notes--hardening-ideas).
 
 ![Microsfot Defender Reccomendations](./screenshots/14-reccomnedations.png)
-> Defender for Cloud → Recommendations (or the vault's *Security* → recommendations view) scoped to `kv-lab-jayden2`, showing the active findings with "Diagnostic logs in Key Vault should be enabled" visible. Save as `docs/images/14-recommendations.png`.
 
 ### 6. KQL Security Queries (Remediate & Verify)
 
@@ -265,10 +225,8 @@ AzureDiagnostics
 ```
 
 ![Diagnostic Setting](./screenshots/15-diagnostic-setting.png)
-> The Key Vault **Monitoring → Diagnostic settings** screen showing the `AuditEvent` category being sent to the Log Analytics workspace. This is proof the finding was remediated. Save as `docs/images/15-diagnostic-setting.png`.
 
 ![KQL Audit](./screenshots/kql-audit.png)
-> The Log Analytics query editor running the query above with a returned set of `SecretGet` events. This is the key capture — it proves audit logging is live and secret access is queryable. Save as `docs/images/16-kql-audit.png`.
 
 > Note: allow ~10–15 minutes after enabling the diagnostic setting for logs to start flowing before the query returns rows.
 
