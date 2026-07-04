@@ -27,7 +27,6 @@ An Azure security baseline provisioned with Terraform and deployed through a Git
   - [4. Custom RBAC Role](#4-custom-rbac-role)
   - [5. Defender Recommendations](#5-defender-recommendations)
   - [6. KQL Security Queries (Remediate & Verify)](#6-kql-security-queries-remediate--verify)
-- [Screenshot Index](#screenshot-index)
 - [Skills Demonstrated](#skills-demonstrated)
 - [Notes & Hardening Ideas](#notes--hardening-ideas)
 - [Teardown](#teardown)
