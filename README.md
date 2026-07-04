@@ -6,8 +6,6 @@
 
 An Azure security baseline provisioned with Terraform and deployed through a GitHub Actions pipeline that authenticates to Azure with **OIDC federated credentials** — no long-lived secrets. The environment enforces the **CIS Azure Foundations Benchmark** with policy-as-code, keeps a secret in **Key Vault reachable only over a Private Endpoint**, and demonstrates **least-privilege RBAC** with a custom role. **Microsoft Defender for Cloud** measures posture throughout.
 
-> The infrastructure (Part 2) is deployed by the pipeline: validated on every pull request, applied automatically on merge to `main`. The policy assignment, custom role, and reviews (Parts 1, 4–6) are portal/CLI steps documented below.
-
 ---
 
 ## Table of Contents
