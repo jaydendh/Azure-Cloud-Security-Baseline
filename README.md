@@ -13,7 +13,6 @@ An Azure security baseline provisioned with Terraform and deployed through a Git
 - [Architecture](#architecture)
 - [Security Controls](#security-controls)
 - [Tech Stack](#tech-stack)
-- [Repository Structure](#repository-structure)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Prerequisites](#prerequisites)
 - [One-Time Setup](#one-time-setup)
