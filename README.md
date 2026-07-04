@@ -1,6 +1,5 @@
 # Azure Cloud Security Baseline — Key Vault, Private Endpoints & Policy-as-Code
 
-[![Terraform CI/CD](https://github.com/jaydendh/Azure-Cloud-Security-Baseline/actions/workflows/terraform.yml/badge.svg)](https://github.com/jaydendh/Azure-Cloud-Security-Baseline/actions/workflows/terraform.yml)
 ![Terraform](https://img.shields.io/badge/Terraform-1.9-844FBA?logo=terraform&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-Cloud%20Security-0078D4?logo=microsoftazure&logoColor=white)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20%2B%20OIDC-2088FF?logo=githubactions&logoColor=white)
